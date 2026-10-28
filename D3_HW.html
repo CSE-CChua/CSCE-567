@@ -1,0 +1,209 @@
+<!-- 
+  Christopher Jhon Lloyd Chua
+  CSCE 567 – Visualization Tools
+  University of South Carolina - Columbia
+  JavaScript/D3 Homework
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3 Visualization Homework</title>
+    <!-- pulling in the d3 library -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .author-info {
+            font-style: italic;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        p {
+            max-width: 900px;
+            line-height: 1.5;
+        }
+        .chart-container {
+            margin-bottom: 60px;
+        }
+        /* styling for the bars so they change to light green when you hover over them */
+        .bar {
+            fill: teal;
+            transition: fill 0.2s;
+        }
+        .bar:hover {
+            fill: lightgreen; 
+        }
+        .axis-label {
+            font-size: 16px;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- top description paragraph and link to the dataset -->
+    <h1>D3 Visualization Homework</h1>
+    <div class="author-info">By: Christopher Jhon Lloyd Chua</div>
+    
+    <p>The scatter plot below shows the number of drivers and vehicles in the US for each year from 1960 through 2023. The red circles are for years when the number of drivers was larger than the number of vehicles, and blue circles are for years when the number of drivers was less than or equal to the number of vehicles.</p>
+    <p>The data used in this visualization is from the Department of Transportation and is available at <a href="https://catalog.data.gov/dataset/licensed-drivers-vehicle-registrations-and-resident-population-dv-1c" target="_blank">data.gov</a>.</p>
+
+    <div id="scatterplot" class="chart-container"></div>
+    <div id="barchart" class="chart-container"></div>
+
+    <script>
+        // link to the raw csv data
+        const csvUrl = "https://data.transportation.gov/api/views/9hnm-fr6r/rows.csv";
+
+        const margin = {top: 40, right: 40, bottom: 60, left: 80};
+        const width = 1000 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
+        // Load and Process Data
+        d3.csv(csvUrl).then(function(rawData) {
+            
+            // turning the string numbers into actual numbers and dividing by a million so the axes aren't super cluttered
+            const data = rawData.map(d => {
+                const getVal = (row, searchStr) => {
+                    const key = Object.keys(row).find(k => k.toLowerCase().includes(searchStr));
+                    return key && row[key] ? +(row[key].replace(/,/g, '')) : 0;
+                };
+
+                return {
+                    Year: getVal(d, 'year'),
+                    // Made the search strings much broader to catch variations in the dataset headers
+                    Drivers: getVal(d, 'driver') / 1000000, 
+                    Vehicles: getVal(d, 'vehicle') / 1000000
+                };
+            }).filter(d => d.Year >= 1960 && d.Year <= 2023); // only want the years from 1960 to 2023
+
+            // ==========================================
+            // drawing the scatter plot
+            // ==========================================
+            const svgScatter = d3.select("#scatterplot")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // mapping the data values to screen pixels
+            const xScaleScatter = d3.scaleLinear()
+                .domain([d3.min(data, d => d.Drivers) - 10, d3.max(data, d => d.Drivers) + 10])
+                .range([0, width]);
+
+            const yScaleScatter = d3.scaleLinear()
+                .domain([d3.min(data, d => d.Vehicles) - 10, d3.max(data, d => d.Vehicles) + 10])
+                .range([height, 0]);
+
+            // adding the x and y axes to the screen
+            svgScatter.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(xScaleScatter));
+
+            svgScatter.append("g")
+                .call(d3.axisLeft(yScaleScatter));
+
+            // labeling the axis
+            svgScatter.append("text")
+                .attr("class", "axis-label")
+                .attr("x", width / 2)
+                .attr("y", height + 40)
+                .text("Drivers (in millions)");
+
+            svgScatter.append("text")
+                .attr("class", "axis-label")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", -50)
+                .text("Vehicles (in millions)");
+
+            // plotting all the dots
+            svgScatter.selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("cx", d => xScaleScatter(d.Drivers))
+                .attr("cy", d => yScaleScatter(d.Vehicles))
+                .attr("r", 7)
+                // color coding it red if there are more drivers than vehicles, otherwise blue
+                .attr("fill", d => d.Drivers > d.Vehicles ? "indianred" : "slateblue")
+                .attr("opacity", 0.8)
+                // adding the tooltip so you can see the exact stats when hovering over a dot
+                .append("title")
+                .text(d => `Year: ${d.Year}\nDrivers: ${Math.round(d.Drivers)} million\nVehicles: ${Math.round(d.Vehicles)} million`);
+
+
+            // ==========================================
+            // moving on to the bar chart
+            // ==========================================
+            const svgBar = d3.select("#barchart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // setting up scales for the bars
+            const xScaleBar = d3.scaleBand()
+                .domain(data.map(d => d.Year))
+                .range([0, width])
+                .padding(0.1);
+
+            const yScaleBar = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.Vehicles)])
+                .nice()
+                .range([height, 0]);
+
+            // drawing the x axis but skipping some years so the text doesn't overlap
+            const xAxisBar = d3.axisBottom(xScaleBar)
+                .tickValues(xScaleBar.domain().filter(year => year % 5 === 0));
+
+            svgBar.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(xAxisBar);
+
+            svgBar.append("g")
+                .call(d3.axisLeft(yScaleBar));
+
+            // labeling the bar chart axis
+            svgBar.append("text")
+                .attr("class", "axis-label")
+                .attr("x", width / 2)
+                .attr("y", height + 40)
+                .text("Year");
+
+            svgBar.append("text")
+                .attr("class", "axis-label")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", -50)
+                .text("Vehicles (in millions)");
+
+            svgBar.selectAll(".bar")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar") 
+                .attr("x", d => xScaleBar(d.Year))
+                .attr("y", d => yScaleBar(d.Vehicles))
+                .attr("width", xScaleBar.bandwidth())
+                .attr("height", d => height - yScaleBar(d.Vehicles))
+                // adding the tooltip for the bars
+                .append("title")
+                .text(d => `Year: ${d.Year}\n${Math.round(d.Vehicles)} million vehicles`);
+
+        }).catch(error => {
+            console.error("Error loading the CSV data: ", error);
+        });
+    </script>
+</body>
+</html>
