@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Stack HW: NCAA Women's Basketball</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 40px;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .container {
+            max-width: 1050px;
+            margin: auto;
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 25px rgba(0,0,0,0.05);
+            border-top: 8px solid #3b82f6; 
+        }
+        h1 {
+            color: #f8fafc;
+            margin-top: 0;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        p {
+            line-height: 1.6;
+            color: #94a3b8;
+        }
+        a {
+            color: #f87171;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: #334155;
+            margin: 30px 0;
+        }
+
+        .tableauPlaceholder {
+            margin: 0 auto !important;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>NCAA D1 Women's Basketball: Field Goal Percentages</h1>
+        
+        <p>This dashboard visualizes the current season's field goal statistics for NCAA Division 1 Women's Basketball teams. The top bar chart ranks each program by their overall field goal percentage, while the bottom scatter plot compares total field goals made versus field goals attempted to highlight overall offensive volume and shooting efficiency.</p>
+        <p><strong>Data Source:</strong> <a href="https://www.ncaa.com/stats/basketball-women/d1/current/team/114" target="_blank">NCAA.com Official Statistics</a></p>
+
+        <hr>
+        
+        <div class='tableauPlaceholder' id='viz1793999225035' style='position: relative'><noscript><a href='#'><img alt='Dashboard 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;NC&#47;NCAA_FG_Stats&#47;Dashboard1&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='site_root' value='' /><param name='name' value='NCAA_FG_Stats&#47;Dashboard1' /><param name='tabs' value='no' /><param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;NC&#47;NCAA_FG_Stats&#47;Dashboard1&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1793999225035');                    var vizElement = divElement.getElementsByTagName('object')[0];                    if ( divElement.offsetWidth > 800 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else if ( divElement.offsetWidth > 500 ) { vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';} else { vizElement.style.width='100%';vizElement.style.height='727px';}                     var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+
+    </div>
+
+</body>
+</html>
